@@ -5,7 +5,7 @@
  * Displays the complete AI code review with
  * all sections, PDF download, and copy to clipboard.
  */
-
+import { HiOutlineChat } from 'react-icons/hi';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { reviewsAPI } from '../services/api';
@@ -33,7 +33,6 @@ import {
   HiOutlineCode,
   HiOutlineStar,
   HiOutlineDocumentText,
-  HiOutlineChatBubbleLeftRight
 } from 'react-icons/hi';
 
 SyntaxHighlighter.registerLanguage('javascript', js);
