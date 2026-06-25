@@ -235,8 +235,8 @@ async function streamReview(code, language) {
 
   return stream;
 
-  module.exports = {
-    analyzeCode,
-    streamReview,
-  };
 }
+module.exports = {
+  analyzeCode,
+  streamReview,
+};
