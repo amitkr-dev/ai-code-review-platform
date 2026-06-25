@@ -204,14 +204,12 @@ function clamp(val, min, max) {
   return Math.min(Math.max(val, min), max);
 }
 
-module.exports = { analyzeCode };
-
-export const streamReview = async (code, language) => {
+async function streamReview(code, language) {
   if (!code || typeof code !== "string") {
     throw new Error("Invalid code input");
   }
 
-  const prompt = buildReviewPrompt(code, language || "unknown");
+  const prompt = buildPrompt(code, language || "unknown");
 
   // stream: true returns an async iterator — do NOT await the whole thing
   const stream = await groq.chat.completions.create({
@@ -231,10 +229,14 @@ export const streamReview = async (code, language) => {
         content: prompt,
       },
     ],
-    temperature: 0.3,
-    max_tokens: 4096,
+    temperature: 0.2,
     stream: true, // KEY: enables token-by-token streaming
   });
 
   return stream;
-};
+
+  module.exports = {
+    analyzeCode,
+    streamReview,
+  };
+}
