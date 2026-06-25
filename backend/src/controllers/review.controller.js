@@ -13,7 +13,7 @@ console.log(
   Review.schema.path("codeSmells")
 );
 const User = require("../models/User.model");
-const { analyzeCode, streamReview } = require("../utils/Groq.service");
+const { analyzeCode, streamReview } = require("../utils/groq.service");
 
 /**
  * POST /api/reviews
