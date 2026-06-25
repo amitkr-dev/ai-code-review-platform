@@ -9,11 +9,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '/api', // Proxied to backend in dev, same-origin in prod
-  timeout: 120000, // 2 min timeout (AI analysis can be slow)
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 /**
