@@ -13,7 +13,7 @@ console.log(
   Review.schema.path("codeSmells")
 );
 const User = require("../models/User.model");
-const { analyzeCode } = require("../utils/gemini.service");
+const { analyzeCode } = require("../utils/Groq.service");
 
 /**
  * POST /api/reviews
@@ -63,7 +63,7 @@ exports.submitReview = [
       });
 
       try {
-        // Call Gemini AI for analysis
+        // Call Groq AI for analysis
         const analysis = await analyzeCode(code, language);
         const processingTime = Date.now() - startTime;
 
@@ -243,3 +243,5 @@ exports.deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+
+

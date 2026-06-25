@@ -1,8 +1,8 @@
 /**
  * ============================================
- * Gemini AI Service — Code Analysis
+ * Groq AI Service — Code Analysis
  * ============================================
- * Sends code to Google Gemini 1.5 Flash
+ * Sends code to Groq Ai 1.5 Flash
  * with a structured prompt and parses the
  * JSON response into our Review schema format.
  */
@@ -14,7 +14,7 @@ const groq = new Groq({
 });
 
 /**
- * Analyze code using Gemini and return structured review data.
+ * Analyze code using Groq and return structured review data.
  * @param {string} code - The source code to analyze
  * @param {string} language - Programming language identifier
  * @returns {Object} Structured analysis result
@@ -205,3 +205,36 @@ function clamp(val, min, max) {
 }
 
 module.exports = { analyzeCode };
+
+export const streamReview = async (code, language) => {
+  if (!code || typeof code !== "string") {
+    throw new Error("Invalid code input");
+  }
+
+  const prompt = buildReviewPrompt(code, language || "unknown");
+
+  // stream: true returns an async iterator — do NOT await the whole thing
+  const stream = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a Senior Staff Engineer at a FAANG company. " +
+          "Perform a thorough code review. Cover: bugs, security vulnerabilities, " +
+          "performance issues, code smells, naming, complexity (time + space), " +
+          "and best practices. Be specific. Reference line numbers when possible. " +
+          "Format your response in clean Markdown.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.3,
+    max_tokens: 4096,
+    stream: true, // KEY: enables token-by-token streaming
+  });
+
+  return stream;
+};
