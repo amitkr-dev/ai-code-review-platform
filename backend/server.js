@@ -67,6 +67,18 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running', timestamp: new Date() });
 });
 
+/* ---------- Root Route ---------- */
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    name: 'AI Code Review Platform API',
+    status: 'Running',
+    version: '1.0.0',
+    health: '/api/health',
+    documentation: 'Coming Soon'
+  });
+});
+
 /* ---------- 404 Handler ---------- */
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
