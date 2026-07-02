@@ -27,17 +27,17 @@ exports.getStats = async (req, res, next) => {
       securityStats
     ] = await Promise.all([
       // 1. Total completed reviews
-      Review.countDocuments({ user: userId, status: 'completed' }),
+      Review.countDocuments({ user: userId}),
 
       // 2. Average quality score
       Review.aggregate([
-        { $match: { user: userId, status: 'completed' } },
+        { $match: { user: userId} },
         { $group: { _id: null, avgScore: { $avg: '$qualityScore' } } }
       ]),
 
       // 3. Reviews per language
       Review.aggregate([
-        { $match: { user: userId, status: 'completed' } },
+        { $match: { user: userId } },
         { $group: { _id: '$language', count: { $sum: 1 }, avgScore: { $avg: '$qualityScore' } } },
         { $sort: { count: -1 } }
       ]),
@@ -46,14 +46,14 @@ exports.getStats = async (req, res, next) => {
       getWeeklyTrends(userId),
 
       // 5. 5 most recent reviews
-      Review.find({ user: userId, status: 'completed' })
+      Review.find({ user: userId})
         .select('title language qualityScore createdAt linesOfCode')
         .sort({ createdAt: -1 })
         .limit(5),
 
       // 6. Bug severity distribution
       Review.aggregate([
-        { $match: { user: userId, status: 'completed' } },
+        { $match: { user: userId} },
         { $unwind: '$bugs' },
         { $group: { _id: '$bugs.severity', count: { $sum: 1 } } },
         { $sort: { count: -1 } }
@@ -61,7 +61,7 @@ exports.getStats = async (req, res, next) => {
 
       // 7. Security issue count
       Review.aggregate([
-        { $match: { user: userId, status: 'completed' } },
+        { $match: { user: userId} },
         { $unwind: { path: '$securityIssues', preserveNullAndEmptyArrays: true } },
         { $group: { _id: null, total: { $sum: 1 } } }
       ])
@@ -115,7 +115,6 @@ async function getWeeklyTrends(userId) {
     {
       $match: {
         user: userId,
-        status: 'completed',
         createdAt: { $gte: eightWeeksAgo }
       }
     },
