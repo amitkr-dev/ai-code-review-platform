@@ -31,7 +31,7 @@ async function analyzeCode(code, language) {
           content: prompt,
         },
       ],
-      temperature: 0.2,
+      temperature: 0,
     });
 
     const rawText = completion.choices[0].message.content;
@@ -45,7 +45,22 @@ async function analyzeCode(code, language) {
       throw new Error("AI response could not be parsed as JSON");
     }
 
-    const parsed = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+    const cleaned = (jsonMatch?.[1] || jsonMatch?.[0] || rawText)
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (err) {
+      console.error("========== INVALID JSON ==========");
+      console.error(cleaned);
+      console.error("==================================");
+
+      throw new Error("Groq returned invalid JSON.");
+    }
     [
       "bugs",
       "improvements",
@@ -234,7 +249,6 @@ async function streamReview(code, language) {
   });
 
   return stream;
-
 }
 module.exports = {
   analyzeCode,
