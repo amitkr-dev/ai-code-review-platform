@@ -79,7 +79,7 @@ exports.submitReview = [
         console.log("VALUE:", analysis.codeSmells);
         console.log("================================");
 
-        review.codeSmells = [];
+        review.codeSmells = analysis.codeSmells || [];
         review.securityIssues = analysis.securityIssues;
         review.timeComplexity = analysis.timeComplexity;
         review.spaceComplexity = analysis.spaceComplexity;
