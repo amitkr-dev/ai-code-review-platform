@@ -81,7 +81,7 @@ async function analyzeCode(code, language) {
       }
     });
 
-    console.log("PARSED AI RESPONSE:", JSON.stringify(parsed, null, 2));
+    // console.log("PARSED AI RESPONSE:", JSON.stringify(parsed, null, 2));
 
     // Validate and sanitize the parsed result
     return sanitizeResult(parsed);
@@ -158,7 +158,7 @@ Return ONLY the JSON object.`;
  * Sanitizes and validates the AI response to match our schema.
  */
 function sanitizeResult(data) {
-  console.log("RAW DATA:", JSON.stringify(data, null, 2));
+  // console.log("RAW DATA:", JSON.stringify(data, null, 2));
   return {
     qualityScore: clamp(Number(data.qualityScore) || 0, 0, 100),
     summary: String(data.summary || "No summary generated."),
