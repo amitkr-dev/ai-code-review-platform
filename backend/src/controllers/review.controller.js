@@ -74,10 +74,6 @@ exports.submitReview = [
         review.bugs = analysis.bugs;
         review.improvements = analysis.improvements;
         review.namingSuggestions = analysis.namingSuggestions;
-        console.log("================================");
-        console.log("TYPE:", typeof analysis.codeSmells);
-        console.log("VALUE:", analysis.codeSmells);
-        console.log("================================");
 
         review.codeSmells = analysis.codeSmells || [];
         review.securityIssues = analysis.securityIssues;
