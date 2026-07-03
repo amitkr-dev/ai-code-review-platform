@@ -5,16 +5,19 @@
  * Provides summary stats, language breakdown,
  * and weekly trend data for the dashboard.
  */
-
+const mongoose = require('mongoose');
 const Review = require('../models/Review.model');
 
+// const userId = req.user.id; // string — fine for countDocuments/find
+// const userObjectId = new mongoose.Types.ObjectId(userId); // required for aggregate() pipelines
 /**
  * GET /api/dashboard/stats
  * Returns all data needed to populate the dashboard.
  */
 exports.getStats = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id; // string — fine for countDocuments/find
+    const userObjectId = new mongoose.Types.ObjectId(userId); // required for aggregate() pipelines
 
     // Run all aggregation queries in parallel for speed
     const [
@@ -31,19 +34,19 @@ exports.getStats = async (req, res, next) => {
 
       // 2. Average quality score
       Review.aggregate([
-        { $match: { user: userId} },
+        { $match: { user: userObjectId} },
         { $group: { _id: null, avgScore: { $avg: '$qualityScore' } } }
       ]),
 
       // 3. Reviews per language
       Review.aggregate([
-        { $match: { user: userId } },
+        { $match: { user: userObjectId } },
         { $group: { _id: '$language', count: { $sum: 1 }, avgScore: { $avg: '$qualityScore' } } },
         { $sort: { count: -1 } }
       ]),
 
       // 4. Weekly review trends (last 8 weeks)
-      getWeeklyTrends(userId),
+      getWeeklyTrends(userObjectId),
 
       // 5. 5 most recent reviews
       Review.find({ user: userId})
@@ -53,7 +56,7 @@ exports.getStats = async (req, res, next) => {
 
       // 6. Bug severity distribution
       Review.aggregate([
-        { $match: { user: userId} },
+        { $match: { user: userObjectId} },
         { $unwind: '$bugs' },
         { $group: { _id: '$bugs.severity', count: { $sum: 1 } } },
         { $sort: { count: -1 } }
@@ -61,7 +64,7 @@ exports.getStats = async (req, res, next) => {
 
       // 7. Security issue count
       Review.aggregate([
-        { $match: { user: userId} },
+        { $match: { user: userObjectId} },
         { $unwind: { path: '$securityIssues', preserveNullAndEmptyArrays: true } },
         { $group: { _id: null, total: { $sum: 1 } } }
       ])
@@ -107,14 +110,14 @@ exports.getStats = async (req, res, next) => {
  * Helper: Get review counts and avg scores for the last 8 weeks.
  * Uses a pipeline that groups by week buckets.
  */
-async function getWeeklyTrends(userId) {
+async function getWeeklyTrends(userObjectId) {
   const eightWeeksAgo = new Date();
   eightWeeksAgo.setDate(eightWeeksAgo.getDate() - 56);
 
   const results = await Review.aggregate([
     {
       $match: {
-        user: userId,
+        user: userObjectId,
         createdAt: { $gte: eightWeeksAgo }
       }
     },
